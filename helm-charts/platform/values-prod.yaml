@@ -1,0 +1,72 @@
+# values-prod.yaml - Configuration for production VPS with k3s
+
+backend:
+  enabled: true
+  replicas: 2  # HA setup
+  image:
+    repository: your-registry.com/store-platform-backend  # Replace with: dockerhub-username/backend or gcr.io/project/backend
+    tag: v1.0.0
+    pullPolicy: Always  # Pull from registry
+  service:
+    type: ClusterIP
+    port: 8000
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  # Security context for production
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    allowPrivilegeEscalation: false
+
+dashboard:
+  enabled: true
+  replicas: 2  # HA setup
+  image:
+    repository: your-registry.com/store-platform-dashboard  # Replace with: dockerhub-username/dashboard
+    tag: v1.0.0
+    pullPolicy: Always  # Pull from registry
+  service:
+    type: ClusterIP
+    port: 80
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "400m"
+  # Security context for production
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 101  # nginx user
+    allowPrivilegeEscalation: false
+ certificates
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"  # Force HTTPS
+    nginx.ingress.kubernetes.io/rate-limit: "100"  # Rate limiting (100 req/min)
+  hosts:
+    - host: platform.yourdomain.com  # Replace with your actual domain (e.g., platform.example.com)
+      paths:
+        - path: /api
+          pathType: Prefix
+          service: backend
+        - path: /
+          pathType: Prefix
+          service: dashboard
+  tls:
+    - secretName: platform-tls  # cert-manager will create this secret
+      hosts:
+        - platform.yourdomain.com
+
+# Production k3s configuration
+environment: production
+storageClass: local-path  # k3s default, or use cloud provider storageClass (gp2, pd-standard, etc.)
+        - platform.yourdomain.com
+
+# Production k3s configuration
+environment: production
+storageClass: local-path  # k3s default, or use cloud storage class

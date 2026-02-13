@@ -1,0 +1,9 @@
+apiVersion: v2
+name: store-platform
+description: Kubernetes-based Store Provisioning Platform
+type: application
+version: 1.0.0
+appVersion: "1.0"
+maintainers:
+  - name: Prajwal Aswar
+    email: prajwal@example.com

@@ -1,0 +1,55 @@
+# values-local.yaml - Configuration for local Kind cluster
+
+backend:
+  enabled: true
+  replicas: 1
+  image:
+    repository: store-platform-backend
+    tag: latest
+    pullPolicy: Never  # For local builds
+  service:
+    type: ClusterIP
+    port: 8000
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+dashboard:
+  enabled: true
+  replicas: 1
+  image:
+    repository: store-platform-dashboard
+    tag: latest
+    pullPolicy: Never  # For local builds
+  service:
+    type: ClusterIP
+    port: 80
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations: {}
+  hosts:
+    - host: platform.localhost
+      paths:
+        - path: /api
+          pathType: Prefix
+          service: backend
+        - path: /
+          pathType: Prefix
+          service: dashboard
+
+# Local Kind cluster configuration
+environment: local
+storageClass: standard  # Kind uses local-path by default
